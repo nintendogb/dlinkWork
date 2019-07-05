@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+{% extends "layout.html" %}
+
+{% block main %}
+<table align="center">
+    <thead>
+    <tbody>
+      <meta charset="UTF-8">
+        <tr>
+            <td align="left" >Each page shows maximum {{ pageAmount }} logs。</td>
+        </tr>
+        <tr>
+            <td align="left" >Each log record fail item in {{ logPeriod }} minutes period</td>
+        </tr>
+        <tr>
+            <td align="left" >It's page {{ currentPage }} </td>
+        </tr>
+    </tbody>
+</table>
+<table border="1" style="word-break:normal; word-wrap:break-all;"  align="center">
+    <thead>
+    <th>Record time</th>
+    {% for site in siteList %}
+    <th>Error statistic of site {{ site }}</th>
+    {% endfor %}
+    </thead>
+    <tbody>
+      <meta charset="UTF-8">
+      {% for redisLog in redisLogList %}
+        <tr>
+            <td>{{ redisLog.logTime }}</td>
+            {% for site in siteList %}
+            <td align="left" >
+                {% for item in redisLog[site] %}
+                <p>{{ item }}</p>
+                {% endfor %}
+            </td>
+            {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block footer %}
+<table align="center">
+    <thead>
+    <tbody>
+      <meta charset="UTF-8">
+        <tr id="pageRow">
+            <td> PAGE </td>
+            {% if totalPage>9 %}
+                {% if currentPage>4 and currentPage<totalPage-3 %}
+            <td><a href="{{ url_for('log.log_list', page = 1) }}">1</a></td>
+            <td>...</td>
+                    {% for number in range(currentPage-2, currentPage+3) %}
+            <td><a href="{{ url_for('log.log_list', page = number) }}">{{ number }}</a></td>
+                    {% endfor %}
+            <td>...</td>
+            <td><a href="{{ url_for('log.log_list', page = totalPage) }}">{{ totalPage }}</a></td>
+                {% elif currentPage>=totalPage-3 and currentPage<=totalPage %}
+            <td><a href="{{ url_for('log.log_list', page = totalPage) }}">1</a></td>
+            <td>...</td>
+                    {% for number in range(totalPage-8, totalPage+1) %}
+            <td><a href="{{ url_for('log.log_list', page = number) }}">{{ number }}</a></td>
+                    {% endfor %}
+                {% else %}
+                    {% for number in range(1, 8) %}
+            <td><a href="{{ url_for('log.log_list', page = number) }}">{{ number }}</a></td>
+                    {% endfor %}
+            <td>...</td>
+            <td><a href="{{ url_for('log.log_list', page = totalPage) }}">{{ totalPage }}</a></td>
+                {% endif %}
+            {% else %}
+                {% for number in range(1, totalPage+1) %}
+            <td><a href="{{ url_for('log.log_list', page = number) }}">{{ number }}</a></td>
+                {% endfor %}
+            {% endif %}
+        </tr>
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,32 @@
+---
+- hosts: server
+  gather_facts: false
+  vars:
+    python_packages:
+      - click
+      - redis
+  tasks:
+    - name: Creates directory
+      file:
+        path: ~/toolRedis
+        state: directory
+        owner: qateam
+        group: qateam
+        mode: 0775
+        recurse: yes
+
+    - name: Copy tool to remote machine
+      copy:
+        src: ./redisTool.py
+        dest: ~/toolRedis
+        force: yes
+        owner: qateam
+        group: qateam
+        mode: 0775
+
+    - name: 'install python {{ python_packages }} lib'
+      pip:
+        name: '{{ python_packages }}'
+
+    - name: Execute Script
+      command: 'python ~/toolRedis/redisTool.py -t stress -c 1000000 -o 0 -m 50 -s {{ reids_url }} -d 60'

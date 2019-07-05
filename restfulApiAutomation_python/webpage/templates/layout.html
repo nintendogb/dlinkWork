@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>apiscan result</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='./style/style.css') }}">
+</head>
+<body>
+        <div id="head">
+    {% block head %}
+            <img src="/static/images/dlink.jpg" width="200" height="80">
+            <span id="title"><h2><strong>SQA team auto test result</strong></h2></span>
+            {% if current_user.is_authenticated %}
+            <span id="welcome" >Current user: {{ current_user.id }}</span>
+            {% endif %}
+    {% endblock %}
+        </div>
+     <div style="clear:both"></div>
+ 
+    <div id="leftPanel">
+        <ul> 
+          {% if current_user.is_authenticated %}
+          <li><a href="/auth/logout">SIGN OUT</a></li>
+          {% else %}
+          <li><a href="/auth/login">SIGN IN</a></li>
+          {% endif %}
+          <li><a href="/log/newest">NEWEST</a></li> 
+          <li><a href="/log/get-redis-log">LOG LIST</a></li> 
+          <li><a href="/log/download-list">DOWNLOAD LOG ZIP</a></li> 
+          <li><a href="/log/fail-count">FAIL ITEM STATISTIC</a></li>
+        </ul>
+    </div>
+
+         <div id="main">
+            {% block main %}
+            <div id='latestLog'></div>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+            <script>
+            function updateLatest() {
+                $.ajax({
+                    cache: false,
+                    url: '/log/get-latest',
+                    type: 'get',
+                    success:function(response){
+                        $('#latestLog').empty()
+                        $('#latestLog').append($('<h3>').text('Last update: ' + response['date']))
+                        $.each(response, function(key, value) {
+                            if(key == 'date'){
+                               // $('#latestLog').append($('<h3>').text('Last update: ' + value))
+                            }else{
+                                var tmpP = $('<h3>').text(key + ' status: ')
+                                if(value == 'pass'){
+                                    var PASS = $('<span>').text('PASS')
+                                    PASS.attr('style',  'color:green;');
+                                    tmpP.append(PASS)
+                                    $('#latestLog').append(tmpP)
+                                }else if(value == 'NOT RUNNING'){
+                                    var NO_RUN = $('<span>').text('NOT RUNNING')
+                                    NO_RUN.attr('style',  'color:yellow;');
+                                    tmpP.append(NO_RUN)
+                                    $('#latestLog').append(tmpP)
+                                }else{
+                                    var FAIL = $('<span>').text('FAIL')
+                                    FAIL.attr('style',  'color:red;');
+                                    tmpP.append(FAIL)
+                                    $('#latestLog').append(tmpP)
+                                    var failUl = $('<ul>')
+                                    $.each(value, function(subKey, subValue) {
+                                        failUl.append($('<li>').text(subValue))
+                                    })
+                                    $('#latestLog').append(failUl)
+                                }
+                            }
+                        });
+                    },
+                    error:function(xhr){
+                        $('#latestLog').empty()
+                        $('#latestLog').text("Error: " + xhr.status + " " + xhr.statusText);
+                    },
+                    complete: function() {
+                        setTimeout(updateLatest, 10000);
+                    }
+                });
+            }
+            updateLatest();
+        </script>
+        {% endblock %}
+        </div>
+
+     <div style="clear:both"></div>
+
+         <div id="footer">
+    {% block footer %}
+    {% endblock %}
+        </div>
+</body>
+</html>

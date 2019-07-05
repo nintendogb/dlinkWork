@@ -1,0 +1,36 @@
+---
+- hosts: server
+  gather_facts: true
+  tasks:
+    - name: install certain python modules for docker
+      pip:
+        name: "{{ item.name }}"
+        state: present
+      with_items:
+      - { name: docker-py }
+
+    - name: pull httpd docker image
+      docker_image:
+        name: httpd
+        source: pull
+
+    - name: Ansible sync test file to remote
+      synchronize:
+        src: ./relayTest
+        dest: ~/
+
+    - name: Build relay_test image
+      docker_image:
+        build:
+          path: "{{ ansible_env.HOME }}/relayTest/tsa_test"
+          pull: yes
+        name: relay_test
+        source: build
+
+    - name: Set periodic docker system prune
+      cron:
+        name: 'docker-prune'
+        minute: '0'
+        hour: '*/2'
+        job: 'docker container prune -f'
+

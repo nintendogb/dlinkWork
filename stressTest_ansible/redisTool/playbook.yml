@@ -1,0 +1,33 @@
+---
+- hosts: server
+  gather_facts: false
+  vars:
+    python_packages:
+      - click
+      - redis
+  tasks:
+    # task 1
+    - name: Creates directory
+      file:
+        path: ~/toolRedis
+        state: directory
+        owner: qateam
+        group: qateam
+        mode: 0775
+        recurse: yes
+
+    - name: clone tool from git
+      git:
+        repo: 'https://nintendogb:{{ password | urlencode }}@bitbucket.org/nintendogb/tool.git'
+        dest: ~/toolRedis
+        force: yes
+        clone: yes
+        update: yes
+
+    - name: 'install python {{ python_packages }} lib'
+      pip:
+        name: '{{ item }}'
+      with_items: '{{ python_packages }}'
+
+    - name: Execute Script
+      command: python ~/toolRedis/redisTool.py -t stress -c 1000000 -o 0 -m 50 -s qa-us-redis.local.mydlink.com -d 60

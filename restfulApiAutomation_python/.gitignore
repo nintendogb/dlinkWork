@@ -1,0 +1,7 @@
+*.log
+*__pycache__
+.coverage
+nagiosPlugin/
+webpage/static/testLog
+routine_script/*_testcase.py
+

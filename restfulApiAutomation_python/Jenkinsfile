@@ -1,0 +1,107 @@
+properties([
+    parameters([
+		string(name: 'WORK_DIR',
+			defaultValue: '/home/qateam/python_client_use',
+			description: 'Where to put script'
+		),
+		string(name: 'LOG_DIR',
+			defaultValue: '/var/log/PythonClientLog',
+			description: 'Where to put log'
+		),
+		string(name: 'TEST_INTERVAL',
+			defaultValue: '5',
+			description: 'interval for test'
+		),
+		string(name: 'LOG_CHECK_INTERVAL',
+			defaultValue: '5',
+			description: 'interval for log check'
+		),
+    ])
+])
+
+node ('aws_apiscan') {
+    checkout scm
+    stage('install python lib on aws_apiscan') {
+        sh """
+        pwd
+        python3 ./jenkins_deploy_script/modifyConfig.py -w "${params.WORK_DIR}" -l "${params.LOG_DIR}" -p "${params.LOG_CHECK_INTERVAL}"
+        sudo python3 setup.py install
+        """
+    }
+    stage('Clear crontab for user qateam') {
+        sh """
+            sudo crontab -r -u qateam 2> /dev/null || echo "No previous qateam crontab"
+        """
+    }
+    stage('stop related service') {
+        sh '''
+        #sudo kill -9 $(sudo lsof -t -i tcp:5000) || echo "No previous running tornado service"
+        sudo docker ps -q -f name=test_result | xargs --no-run-if-empty sudo docker stop
+        sudo docker ps -a -q -f name=test_result | xargs --no-run-if-empty sudo docker rm
+        sudo docker ps -q -f name=result_page | xargs --no-run-if-empty sudo docker stop
+        sudo docker ps -a -q -f name=result_page | xargs --no-run-if-empty sudo docker rm
+        '''
+    }
+    stage('Copy routine run script') {
+        sh """
+        python3 ./jenkins_deploy_script/makeScript.py
+        sudo chmod 777 ./routine_script/exeApiScanAll.sh
+        sudo mkdir -p "${params.WORK_DIR}"
+        sudo mkdir -p "${params.LOG_DIR}"
+        sudo mkdir -p "${params.WORK_DIR}/webpage/static/testLog"
+        sudo mkdir -p "${params.WORK_DIR}/redisData"
+        sudo cp -u ./routine_script/exeApiScanAll.sh "${params.WORK_DIR}"
+        sudo chown -R qateam "${params.LOG_DIR}"
+        sudo chgrp -R qateam "${params.LOG_DIR}"
+        sudo chown -R qateam "${params.WORK_DIR}"
+        sudo chgrp -R qateam "${params.WORK_DIR}"
+        """
+    }
+    stage('build docker image') {
+        sh '''
+        sudo docker build --rm -t python_apiscan .
+        sudo docker system prune --force
+        '''
+    }
+    stage('Update crontab for user qateam') {
+        sh """
+            echo "workaround for first crontab append fail"
+            (sudo crontab -l -u qateam 2> /dev/null; echo "") | sudo crontab - -u qateam
+            (sudo crontab -l -u qateam 2> /dev/null; echo "*/${params.TEST_INTERVAL} * * * * ${params.WORK_DIR}/exeApiScanAll.sh &") | sudo crontab - -u qateam
+
+
+            (sudo crontab -l -u qateam 2> /dev/null; \
+echo "*/${params.LOG_CHECK_INTERVAL} * * * * docker run \
+-v ${params.LOG_DIR}:/log \
+-v ${params.WORK_DIR}/webpage/static/testLog:/webpage/static/testLog \
+--net=host \
+--rm \
+-d python_apiscan routine_script/checkLog.py") | sort | uniq | sudo crontab - -u qateam
+
+
+            (sudo crontab -l -u qateam 2> /dev/null; echo "0 0 * * * docker run \
+-v ${params.LOG_DIR}:/log \
+-v ${params.WORK_DIR}/webpage/static/testLog:/webpage/static/testLog \
+--rm \
+-d python_apiscan routine_script/rmTimeoutZip.py") \
+| sort | uniq | sudo crontab - -u qateam
+
+            sudo crontab -l -u qateam
+
+        """
+    }
+    stage('start related service') {
+        withEnv(['JENKINS_NODE_COOKIE=dontkillme']) {
+            sh """
+                sudo docker run --name test_result -p 6379:6379 -v ${params.WORK_DIR}/redisData:/data -d --restart always redis redis-server --appendonly yes
+                sudo docker run --name result_page -v ${params.WORK_DIR}/webpage/static/testLog:/webpage/static/testLog --net=host -d --restart always python_apiscan
+            """
+        }
+    }
+    stage('unnittest test') {
+        sh """
+        #python3 ./test/pc_unittest.py
+            sudo docker run --rm python_apiscan test/pc_unittest.py
+        """
+    }
+}

@@ -1,0 +1,7 @@
+[server]
+18.144.47.226 ansible_user=qateam
+13.56.223.228 ansible_user=qateam
+
+[server:vars]
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'

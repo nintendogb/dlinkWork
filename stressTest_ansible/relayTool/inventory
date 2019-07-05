@@ -1,0 +1,10 @@
+[server:vars]
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+number_of_relay_process=24
+
+[server]
+13.56.78.33 ansible_user=qateam
+54.183.137.31 ansible_user=qateam
+54.215.211.98 ansible_user=qateam
+

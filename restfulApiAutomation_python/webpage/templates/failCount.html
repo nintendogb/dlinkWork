@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+{% extends "layout.html" %}
+
+{% block main %}
+
+{% if timeRange != 0 %}
+<p>Fail statistic from {{ timeRange }} {{ timePeriod }} until now.</p>
+<table border="1" style="word-break:normal; word-wrap:break-all;"  align="center">
+    <thead>
+    {% for site in siteList %}
+    <th>Error statistic of {{ site }}</th>
+    {% endfor %}
+    </thead>
+    <tbody>
+      <meta charset="UTF-8">
+        <tr>
+        {% for site in siteList %}
+            <td align="left" >
+            {% for item in redisLog[site] %}
+                <p>{{ item }}</p>
+            {% endfor %}
+            </td>
+        {% endfor %}
+        </tr>
+    </tbody>
+</table>
+{% endif %}
+
+{% endblock %}
+
+{% block footer %}
+<form action="/log/fail-count" name="checkFail">
+    Fail statistic from
+    <input type="number" min="1" name="range" >
+    <select name="periodUnit" >
+        <option value="min">Minutes</option>
+　      <option value="hr">Hours</option>
+　      <option value="day">Days</option>
+    </select>
+    until now.
+    <input type="submit" value="查詢">
+</form>
+
+<script language="javascript"> 
+function check(obj){
+    re = /\D/; 
+    if (re.test(obj.value)) { 
+        alert("Non number"); 
+        obj.focus(); 
+   }
+} 
+</script>
+{% endblock %}

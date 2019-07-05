@@ -1,0 +1,15 @@
+---
+- hosts: server
+  gather_facts: false
+  tasks:
+    - name: turn off apache container
+      docker_container:
+        name: apache
+        state: absent
+        force_kill: yes
+
+    - name: Stop all relay_test container.
+      shell: "docker ps -q -f name=relay_test* | xargs --no-run-if-empty docker stop"
+
+    - name: Remove all relay_test container.
+      shell: "docker ps -a -q -f name=relay_test* | xargs --no-run-if-empty docker rm"

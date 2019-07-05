@@ -1,0 +1,31 @@
+---
+- hosts: server
+  gather_facts: true
+  tasks:
+    - name: turn on apache container
+      docker_container:
+        name: apache
+        state: started
+        image: httpd
+        recreate: yes
+        ports:
+          - "80:80"
+        volumes:
+          - "{{ ansible_env.HOME }}/relayTest/www/:/usr/local/apache2/htdocs/"
+
+    - name: turn on relay_test container
+      docker_container:
+        name: "relay_test{{ 
+                  90000000 + (item | int) +
+                  (groups['server'].index(inventory_hostname) | int) *
+                  (number_of_relay_process | int) 
+              }}"
+        state: started
+        image: relay_test
+        network_mode: host
+        command: "/bin/bash /relay_test.sh {{ 
+                     90000000 + (item | int) +
+                     (groups['server'].index(inventory_hostname) | int) *
+                     (number_of_relay_process | int) 
+                 }} {{relay_url}}"
+      with_sequence: count="{{ number_of_relay_process }}"
