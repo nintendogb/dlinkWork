@@ -41,6 +41,15 @@ class BaseApiTest(unittest.TestCase):
         LOGGING.info('')
         LOGGING.info('')
 
+    def assertRes(self, res, res_key, expect_data):
+        res_json = res.json()[res_key]
+        for data in expect_data:
+            if data == 'stat_code':
+                self.assertEqual(expect_data[data], res.status_code)
+            else:
+                self.assertEqual(expect_data[data],  res_json[data])
+        self.assertGreater(RES_THRESHOLD, res.elapsed)
+
 class CnvrRelatedTest(BaseApiTest):
     uap = agent.Uap(URI, CLIENT_ID, CLIENT_SECRET)
     uap.get_user_token(ACCOUNT, PASSWORD)
@@ -84,15 +93,25 @@ class CnvrRelatedTest(BaseApiTest):
 
         # Add event to favorite
         self.uap.cnvr_add_favorite(self.SUBS_ID, self.DEV_ID, event_ts)
-        self.assertEqual(200, self.uap.res.status_code)
-        self.assertGreater(RES_THRESHOLD, self.uap.res.elapsed)
-        res_json = self.uap.res.json()['data']['result']
-        self.assertTrue(res_json)
+        self.assertRes(
+            self.uap.res,
+            'data',
+            {
+                'stat_code': 200,
+                'result': True,
+            },
+        )
 
         # Check favorite event
         self.uap.cnvr_query_favorite_list(start_ts=self.START_TS, end_ts=self.END_TS)
-        self.assertEqual(200, self.uap.res.status_code)
-        self.assertGreater(RES_THRESHOLD, self.uap.res.elapsed)
+        self.assertRes(
+            self.uap.res,
+            'data',
+            {
+                'stat_code': 200,
+                'result': True,
+            },
+        )
         res_json = self.uap.res.json()['data']['list']
         self.assertIsInstance(res_json, (list))
         ts_has_find = False
@@ -103,11 +122,14 @@ class CnvrRelatedTest(BaseApiTest):
         self.assertTrue(ts_has_find)
 
         # Remove favorite event
-        self.uap.cnvr_rm_favorite(fav_id_list)
-        self.assertEqual(200, self.uap.res.status_code)
-        self.assertGreater(RES_THRESHOLD, self.uap.res.elapsed)
-        res_json = self.uap.res.json()['data']['result']
-        self.assertTrue(res_json)
+        self.assertRes(
+            self.uap.res,
+            'data',
+            {
+                'stat_code': 200,
+                'result': True,
+            },
+        )
 
         # Check favorite event remove
         self.uap.cnvr_query_favorite_list(start_ts=self.START_TS, end_ts=self.END_TS)
@@ -131,11 +153,16 @@ class UserRelatedTest(BaseApiTest):
 
     def test_get_user_info(self):
         self.uap.get_user_info()
-        self.assertEqual(200, self.uap.res.status_code)
-        self.assertGreater(RES_THRESHOLD, self.uap.res.elapsed)
+        self.assertRes(
+            self.uap.res,
+            'data',
+            {
+                'stat_code': 200,
+                'email': ACCOUNT,
+            },
+        )
         res_json = self.uap.res.json()['data']
         self.assertIn('first_name', res_json)
-        self.assertEqual(ACCOUNT, res_json['email'])
 
     @unittest.skip("Just skip")
     def test_update_account(self):
@@ -143,20 +170,27 @@ class UserRelatedTest(BaseApiTest):
         l_name = 'Wayne' + str(int(time.time()))
         # Set new name
         self.uap.update_account(ACCOUNT, PASSWORD, f_name, l_name)
-        self.assertEqual(200, self.uap.res.status_code)
-        self.assertGreater(RES_THRESHOLD, self.uap.res.elapsed)
-        res_json = self.uap.res.json()['data']
-        self.assertEqual(f_name, res_json['first_name'])
-        self.assertEqual(l_name, res_json['last_name'])
+        self.assertRes(
+            self.uap.res,
+            'data',
+            {
+                'stat_code': 200,
+                'first_name': f_name,
+                'last_name': l_name,
+            },
+        )
 
         # Check if setting successful
         self.uap.get_user_info()
-        self.assertEqual(200, self.uap.res.status_code)
-        self.assertGreater(RES_THRESHOLD, self.uap.res.elapsed)
-        res_json = self.uap.res.json()['data']
-        self.assertEqual(f_name, res_json['first_name'])
-        self.assertEqual(l_name, res_json['last_name'])
-
+        self.assertRes(
+            self.uap.res,
+            'data',
+            {
+                'stat_code': 200,
+                'first_name': f_name,
+                'last_name': l_name,
+            },
+        )
 
 
 if __name__ == '__main__':
