@@ -1,0 +1,27 @@
+properties([
+    parameters([
+		string(name: 'aws_apiscan_url',
+			defaultValue: '54.67.52.204',
+			description: 'url of aws_apiscan server'
+		),
+	    string(name: 'redis_port',
+			defaultValue: '6379',
+			description: 'port of redis server'
+		),
+		choice(
+		    choices: [
+		        'True', 
+		        'False', 
+		   ], 
+		   description: 'Is in testing or not', 
+		   name: 'in_testing'
+	    ), 
+    ])
+])
+node ('master') {
+    stage('control aws instance') {
+        sh """
+        redis-cli -h ${params.aws_apiscan_url} -p ${params.redis_port} set in_testing ${params.in_testing}
+        """
+    }
+}

@@ -1,0 +1,17 @@
+---
+- hosts: server
+  gather_facts: false
+  tasks:
+    - name: Creates directory
+      file:
+        path: ~/dcd_tester
+        state: directory
+        owner: qateam
+        group: qateam
+        mode: 0775
+        recurse: yes
+
+    - name: Copy tool to remote machine
+      synchronize:
+        src: ./{{ tool_dir }}
+        dest: ~/dcd_tester

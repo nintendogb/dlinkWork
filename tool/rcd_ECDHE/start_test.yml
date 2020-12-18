@@ -1,0 +1,12 @@
+---
+- hosts: server
+  gather_facts: true
+  tasks:
+    - name: turn on rcd_ecdhe container
+      docker_container:
+        name: rcd_ecdhe
+        state: started
+        image: rcd_ecdhe
+        command: "./rcd_ecdhe_test_4000_{{ 
+                     (groups['server'].index(inventory_hostname) | int) + 1
+                 }}.sh"

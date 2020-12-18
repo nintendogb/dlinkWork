@@ -1,0 +1,37 @@
+---
+- hosts: server
+  serial: 1
+  gather_facts: false
+  tasks:
+    - name: Start dcd event
+      shell: "ulimit -n 65536;nohup python3 run_test.py --file_path /home/qateam/dcd_tester/{{ tool_dir }}/dcd_thread_{{
+                   (groups['server'].index(inventory_hostname) | int) + 1
+               }}/event.json  >> event.log 2>&1 &"
+      args:
+        chdir: ~/dcd_tester/{{ tool_dir }}
+
+    - name: Sleep 5 secs for 1 host
+      pause:
+        seconds: 5
+
+    - name: Start dcd keep_alive
+      shell: "ulimit -n 65536;nohup python3 run_test.py --file_path /home/qateam/dcd_tester/{{ tool_dir }}/dcd_thread_{{
+                   (groups['server'].index(inventory_hostname) | int) + 1
+               }}/keep_alive-1.json >> keep-1.log 2>&1 &"
+      args:
+        chdir: ~/dcd_tester/{{ tool_dir }}
+
+    - name: Sleep 5 secs for 1 host
+      pause:
+        seconds: 5
+
+    - name: Start dcd keep_alive
+      shell: "ulimit -n 65536;nohup python3 run_test.py --file_path /home/qateam/dcd_tester/{{ tool_dir }}/dcd_thread_{{
+                   (groups['server'].index(inventory_hostname) | int) + 1
+               }}/keep_alive-2.json >> keep-2.log 2>&1 &"
+      args:
+        chdir: ~/dcd_tester/{{ tool_dir }}
+
+    - name: Sleep 200 secs for 1 host
+      pause:
+        seconds: 5

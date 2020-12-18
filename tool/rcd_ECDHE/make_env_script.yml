@@ -1,0 +1,19 @@
+---
+- hosts: server
+  gather_facts: true
+  tasks:
+    - name: Ansible sync test file to remote
+      synchronize:
+        src: /home/dlink/tool/tool/rcd_ECDHE/rcd_test
+        dest: ~/
+
+    - name: Make test script
+      shell: python3 gen_test_script.py --dev "{{ dev_num }}" --host "{{ groups['server'] | length }}" --bin "{{ test_bin }}"
+      args:
+        chdir: "{{ ansible_env.HOME }}/rcd_test/"
+
+    - name: Build test_environment
+      shell: /bin/bash ./test.sh
+      args:
+        chdir: "{{ ansible_env.HOME }}/rcd_test/"
+      become: true

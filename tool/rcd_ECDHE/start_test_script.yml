@@ -1,0 +1,10 @@
+---
+- hosts: server
+  gather_facts: true
+  tasks:
+    - name: start on rcd_ecdhe test
+      shell: "ulimit -n 65536;nohup ./rcd_ecdhe_test_{{ dev_num }}_{{ 
+                   (groups['server'].index(inventory_hostname) | int) + 1
+               }}.sh  < /dev/null > /dev/null 2>&1 &"
+      args:
+        chdir: "{{ ansible_env.HOME }}/rcd_test/"

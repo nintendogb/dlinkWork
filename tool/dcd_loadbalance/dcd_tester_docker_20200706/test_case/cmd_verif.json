@@ -1,0 +1,257 @@
+{
+  "selected":"sign_in",
+  "register":{
+    "site_prefix": "rd-rdsg",
+    "da":{
+      "default": {
+      },
+      "37831308":{
+        "device_id":"B0C55449C74E",
+        "step":{
+          "0":{
+            "request_parameter":{
+              "command":"register",
+              "owner_id":"b8803141@gmail.com",
+              "owner_token":"XFDGkNz8q2MR_fqqrnJU4JPQSH9RWqN-",
+              "pin_code":"900212"
+            }
+          }
+        }
+      }
+    }
+  },
+  "sign_in":{
+    "site_prefix": "rd-rdsg",
+    "da":{
+      "default": {
+      },
+      "37831308":{
+        "device_id":"B0C55449C74E",
+        "step":{
+          "0":{
+            "request_parameter":{
+              "command":"sign_in",
+              "pin_code":"900212",
+              "api_version":1
+            }
+          }
+        }
+      }
+    }
+  },
+  "get_policy":{
+    "site_prefix": "rd-rdsg",
+    "da":{
+      "default": {
+      },
+      "37831308":{
+        "device_id":"B0C55449C74E",
+        "step":{
+          "0":{
+            "request_parameter":{
+              "command":"sign_in",
+              "pin_code":"900212"
+            }
+          },
+          "1":{
+            "request_parameter":{
+              "command":"get_policy"
+            }
+          }
+        }
+      }
+    }
+  },
+  "get_regular":{
+    "site_prefix": "rd-rdsg",
+    "da":{
+      "default": {
+      },
+      "37831308":{
+        "device_id":"B0C55449C74E",
+        "step":{
+          "0":{
+            "request_parameter":{
+              "command":"sign_in",
+              "pin_code":"900212"
+            }
+          },
+          "1":{
+            "request_parameter":{
+              "command":"get_regular"
+            }
+          }
+        }
+      }
+    }
+  },
+  "get_schedule":{
+    "site_prefix": "rd-rdsg",
+    "da":{
+      "default": {
+      },
+      "37831308":{
+        "device_id":"B0C55449C74E",
+        "step":{
+          "0":{
+            "request_parameter":{
+              "command":"sign_in",
+              "pin_code":"900212"
+            }
+          },
+          "1":{
+            "request_parameter":{
+              "command":"get_schedule",
+              "model":"DCS_8300LH"
+            }
+          }
+        }
+      }
+    }
+  },
+  "get_server_info":{
+    "site_prefix": "rd-rdsg",
+    "da":{
+      "default": {
+      },
+      "37831308":{
+        "device_id":"B0C55449C74E",
+        "step":{
+          "0":{
+            "request_parameter":{
+              "command":"sign_in",
+              "pin_code":"900212"
+            }
+          },
+          "1":{
+            "request_parameter":{
+              "command":"get_server_info"
+            }
+          }
+        }
+      }
+    }
+  },
+  "recycle_channel":{
+    "site_prefix": "rd-rdsg",
+    "da":{
+      "default": {
+      },
+      "37831308":{
+        "device_id":"B0C55449C74E",
+        "step":{
+          "0":{
+            "request_parameter":{
+              "command":"sign_in",
+              "pin_code":"900212"
+            }
+          },
+          "1":{
+            "request_parameter":{
+              "command":"recycle_channel",
+              "channel_url":"https://rd"
+            }
+          }
+        }
+      }
+    }
+  },
+  "event":{
+    "site_prefix": "rd-rdsg",
+    "da":{
+      "default": {
+      },
+      "37831308":{
+        "device_id":"B0C55449C74E",
+        "step":{
+          "0":{
+            "request_parameter":{
+              "command":"sign_in",
+              "pin_code":"900212"
+            }
+          },
+          "1":{
+            "request_parameter":{
+              "command":"event",
+              "event":{
+                "type":56,
+                "name":"Policy Condition Hit",
+                "metadata":{
+                  "conditions":[
+                    {
+                       "X":{
+                        "status":{"uid":15766853,"type":8,"idx":0}
+                       },
+                       "op":"ge",
+                       "Y":{"value":0},
+                       "V":{"value":53}
+                    }
+                  ],
+                  "actions":[]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "start_viewing":{
+    "site_prefix": "rd-rdsg",
+    "da":{
+      "default": {
+      },
+      "37831308":{
+        "device_id":"B0C55449C74E",
+        "step":{
+          "0":{
+            "request_parameter":{
+              "command":"sign_in",
+              "pin_code":"900212"
+            }
+          },
+          "1":{
+            "request_parameter":{
+              "command":"start_viewing",
+              "code":0,
+              "message":"no error",
+              "uid":0,
+              "idx":0,
+              "client_id":"ddd",
+              "channel_url":"https:\/\/rd-rdsg-rcdca",
+              "viewing":{"type":1},
+              "capability":1
+            }
+          }
+        }
+      }
+    }
+  },
+  "sync_info":{
+    "site_prefix": "rd-rdsg",
+    "da":{
+      "default": {
+      },
+      "37831308":{
+        "device_id":"B0C55449C74E",
+        "step":{
+          "0":{
+            "request_parameter":{
+              "command":"sign_in",
+              "pin_code":"900212"
+            }
+          },
+          "1":{
+            "request_parameter":{
+              "command":"sync_info",
+              "metadata":{
+                "type":1,
+                "name":"oob change"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

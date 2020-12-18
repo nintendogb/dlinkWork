@@ -1,0 +1,45 @@
+properties([
+    parameters([
+		string(name: 'open_tool_dir',
+		    defaultValue: '/home/dlink/tool/tool/mydlinkopentools',
+			description: 'directory of open tool'
+		),		
+		string(name: 'account',
+			defaultValue: 'motor2291@gmail.com',
+			description: 'testing account'
+		),
+	    string(name: 'password',
+			defaultValue: '*************************',
+			description: 'password of testing account'
+		),
+	    string(name: 'site',
+			defaultValue: 'qa-tw',
+			description: 'testing site'
+		),
+	    string(name: 'name',
+			defaultValue: 'motor',
+			description: 'schedule name'
+		),
+		string(name: 'start_time',
+			defaultValue: '16:37',
+			description: 'schedule start time'
+		),
+		string(name: 'end_time',
+			defaultValue: '16:38',
+			description: 'schedule end time'
+		),
+    ])
+])
+node ('master') {
+    stage('Change schedule time') {
+        sh """
+        sudo python3 ${params.open_tool_dir}/ChangeScheduleTime.py \
+            --account=${params.account} \
+            --password=${params.password} \
+            --site=${params.site} \
+            --name=${params.name} \
+            --start_time=${params.start_time} \
+            --end_time=${params.end_time}
+        """
+    }
+}

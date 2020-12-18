@@ -1,0 +1,8 @@
+---
+- hosts: server
+  gather_facts: true
+  tasks:
+    - name: Start docker rcd_test
+      shell: docker run --name rcd_ecdhe --rm -d rcd_ecdhe /bin/bash ./rcd_ecdhe_test_4000_{{
+                     (groups['server'].index(inventory_hostname) | int) + 1
+                 }}.sh

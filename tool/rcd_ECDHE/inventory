@@ -1,0 +1,8 @@
+[server:vars]
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+dev_num=300
+ansible_user=qateam
+
+[server]
+54.219.129.82

@@ -1,0 +1,18 @@
+{
+    "load_balance":{
+        "site_prefix": "qa-us",
+            "da":{
+                "default": {
+                    "cipher_list":"ECDHE-RSA-AES128-SHA256",
+                    "step":{
+                        "0":{
+                            "request_parameter":{
+                                "command":"sign_in"
+                            }
+                        }          
+                    }
+                },
+                "8807[0-9][0-9][0-9][0-9]":{}
+            }
+    }  
+}

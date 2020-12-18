@@ -1,0 +1,55 @@
+{
+    "base_case": {
+        "da": {
+            "880305[0-9][0-9]": {
+                "step": {
+                    "1": {
+                        "pre_pause": [
+                            180
+                        ],
+                        "request_parameter": {
+                            "command": "event",
+                            "event": {
+                                "metadata": {
+                                    "actions": [],
+                                    "conditions": [
+                                        {
+                                            "V": {
+                                                "value": 53
+                                            },
+                                            "X": {
+                                                "status": {
+                                                    "idx": 0,
+                                                    "type": 8,
+                                                    "uid": 15766853
+                                                }
+                                            },
+                                            "Y": {
+                                                "value": 0
+                                            },
+                                            "op": "ge"
+                                        }
+                                    ]
+                                },
+                                "name": "Policy Condition Hit",
+                                "type": 56
+                            }
+                        },
+                        "round": 200
+                    }
+                }
+            },
+            "default": {
+                "cipher_list": "ECDHE-RSA-AES128-SHA256",
+                "step": {
+                    "0": {
+                        "request_parameter": {
+                            "command": "sign_in"
+                        }
+                    }
+                }
+            }
+        },
+        "site_prefix": "qa-us-dcdda-1.auto.mydlink.com:443/SwitchCamera"
+    }
+}

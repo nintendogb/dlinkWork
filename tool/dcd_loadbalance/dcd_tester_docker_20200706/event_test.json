@@ -1,0 +1,33 @@
+{
+    "base_case": {
+        "da": {
+            "880105[0-9][0-9]": {
+                "step": {
+                    "1": {
+                        "pre_pause": [
+                            180
+                        ],
+                        "request_parameter": {
+                            "command": "event",
+                            "sequence_id": "",
+                            "event": {
+                            }
+                        },
+                        "round": 200
+                    }
+                }
+            },
+            "default": {
+                "cipher_list": "ECDHE-RSA-AES128-SHA256",
+                "step": {
+                    "0": {
+                        "request_parameter": {
+                            "command": "sign_in"
+                        }
+                    }
+                }
+            }
+        },
+        "site_prefix": "qa-us-dcdda-2.auto.mydlink.com:443/SwitchCamera"
+    }
+}

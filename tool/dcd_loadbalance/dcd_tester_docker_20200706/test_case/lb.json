@@ -1,0 +1,18 @@
+{
+  "load_balance":{
+    "site_prefix": "qa-us",
+    "da":{
+      "delay_connect":[5,10],
+      "default": {
+        "step":{
+          "0":{
+            "request_parameter":{
+              "command":"sign_in"
+            }
+          }
+        }
+      },
+      "880[0][0][0][0][0-9]":{}
+    }
+  }
+}

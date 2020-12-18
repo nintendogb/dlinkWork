@@ -1,0 +1,111 @@
+{
+    "base_case": {
+        "da": {
+            "880308[0-9][0-9]": {
+                "step": {
+                    "1": {
+                        "pre_pause": [
+                            180
+                        ],
+                        "request_parameter": {
+                            "command": "event",
+                            "event": {
+                                "metadata": [
+                                    {
+                                        "model": "DCS-H100",
+                                        "setting": [
+                                            19,
+                                            32,
+                                            33,
+                                            34,
+                                            45,
+                                            256
+                                        ],
+                                        "status": [
+                                            7,
+                                            17,
+                                            19,
+                                            23
+                                        ],
+                                        "sub_id": "58D56EEE453D",
+                                        "uid": 0
+                                    },
+                                    {
+                                        "model": "DCS-2800LH",
+                                        "setting": [
+                                            21,
+                                            27,
+                                            29,
+                                            30,
+                                            31,
+                                            40,
+                                            41,
+                                            42,
+                                            43,
+                                            44,
+                                            48,
+                                            22,
+                                            513,
+                                            "39"
+                                        ],
+                                        "status": [
+                                            8,
+                                            16,
+                                            18,
+                                            22
+                                        ],
+                                        "sub_id": "58D56EEE45C5",
+                                        "uid": 15615429,
+                                        "version": "1.05.00B0"
+                                    },
+                                    {
+                                        "model": "DCS-2800LH",
+                                        "setting": [
+                                            21,
+                                            27,
+                                            29,
+                                            30,
+                                            31,
+                                            40,
+                                            41,
+                                            42,
+                                            43,
+                                            44,
+                                            48,
+                                            22,
+                                            513,
+                                            39
+                                        ],
+                                        "status": [
+                                            8,
+                                            16,
+                                            18,
+                                            22
+                                        ],
+                                        "sub_id": "58D56EEE45D6",
+                                        "uid": 15615446,
+                                        "version": "1.05.00B0"
+                                    }
+                                ],
+                                "name": "Unit Data Change",
+                                "type": 60
+                            }
+                        },
+                        "round": 200
+                    }
+                }
+            },
+            "default": {
+                "cipher_list": "ECDHE-RSA-AES128-SHA256",
+                "step": {
+                    "0": {
+                        "request_parameter": {
+                            "command": "sign_in"
+                        }
+                    }
+                }
+            }
+        },
+        "site_prefix": "qa-us-dcdda-1.auto.mydlink.com:443/SwitchCamera"
+    }
+}

@@ -1,0 +1,51 @@
+properties([
+    parameters([
+		string(name: 'site',
+			defaultValue: 'qa-us',
+			description: 'which site to test  (ex: qa-us, mp-us)'
+		),
+		string(name: 'test_account',
+			defaultValue: 'qatestyf+usqa3@gmail.com',
+			description: 'testing account'
+		),
+		string(name: 'test_password',
+			defaultValue: '**************',
+			description: 'password of test account'
+		),
+		string(name: 'mydlink_id',
+			defaultValue: '34195443',
+			description: 'mydlink_id of test dev'
+		),
+		string(name: 'test_case',
+			defaultValue: '',
+			description: 'run specific test case (empty to run all testcase)'
+		),
+		string(name: 'email_list',
+			description: 'Email to notif test result, using comma seperate each mail'
+		),
+    ])
+])
+node ('master') {
+    stage('check pre condition') {
+        sh """
+        sudo python3 /home/dlink/tool/tool/jenkins/pre_apiscan_check.py -a ${params.test_account} -p ${params.test_password} -d ${params.mydlink_id}
+        """
+    }
+    stage('start test') {
+        sh """
+        START_TIME=\$(date '+%Y%m%d_%H%M')
+        EMAIL_LIST=${params.email_list}
+        echo Test start at \${START_TIME}
+        sudo docker run --name python_apiscan_${params.mydlink_id} \
+        --rm -v /var/log/jenkins_scan/python_apiscan:/log python_apiscan test/openapi_test.sh \
+        ${params.site} ${params.test_account} ${params.test_password} ${params.mydlink_id} \${START_TIME} ${params.test_case}
+
+        if [ \${#EMAIL_LIST} -gt 0 ];
+        then
+            sudo python3 /home/dlink/tool/tool/jenkins/python_apiscan_send_notif.py -t \${START_TIME} -s ${params.site} -e \${EMAIL_LIST}
+        else
+            sudo python3 /home/dlink/tool/tool/jenkins/python_apiscan_send_notif.py -t \${START_TIME} -s ${params.site}
+        fi
+        """
+    }
+}

@@ -1,0 +1,34 @@
+properties([
+    parameters([
+		string(name: 'open_tool_dir',
+		    defaultValue: '/home/dlink/tool/tool/mydlinkopentools',
+			description: 'directory of open tool'
+		),		
+		choice(name: 'site',
+			choices: [
+			    'qa-tw',
+		        'qa-us', 
+		        'qa-hq', 
+		        'mp-us',
+		        'mp-tw',
+		    ], 
+			description: 'test site'
+		),
+	    string(name: 'account',
+			description: 'test account'
+		),
+	    string(name: 'password',
+			description: 'password of test account'
+		),
+    ])
+])
+node ('master') {
+    stage('Execute redis tool') {
+        sh """
+        sudo python3 ${params.open_tool_dir}/show_all_2fa_wrong_res.py \
+            -s '${params.site}' \
+            -a '${params.account}' \
+            -p '${params.password}' \
+        """
+    }
+}

@@ -1,0 +1,56 @@
+properties([
+    parameters([
+		string(name: 'aws_tool_dir',
+		    defaultValue: '/home/dlink/tool/tool/jenkins2aws',
+			description: 'directory of aws tool'
+		),		
+		string(name: 'aws_apiscan_url',
+			defaultValue: '54.67.52.204',
+			description: 'url of aws_apiscan server'
+		),
+	    string(name: 'redis_port',
+			defaultValue: '6379',
+			description: 'port of redis server'
+		),
+	    string(name: 'server_cfg',
+	        defaultValue: "{\
+	        'QA_US_321 memcached 1': [{'action': 'start-instances', 'cron': '0 8 * * *'}],\
+	        'QA_US_321 openapi 1': [{'action': 'start-instances', 'cron': '0 8 * * *'}],\
+	        'QA_US_321 openapi 2': [{'action': 'start-instances', 'cron': '0 8 * * *'}],\
+	        'QA_US_321 openapi 3': [{'action': 'stop-instances', 'cron': '0 20 * * *'}],\
+	        'QA_US_321 openapi 4': [{'action': 'stop-instances', 'cron': '0 20 * * *'}],\
+	        'QA_US_321 rcd 1': [{'action': 'start-instances', 'cron': '0 8 * * *'}],\
+	        'QA_US_321 rcd 2': [{'action': 'stop-instances', 'cron': '0 20 * * *'}],\
+	        'QA_US_321 rcd 3': [{'action': 'stop-instances', 'cron': '0 20 * * *'}],\
+	        'QA_US_321 relay 1': [{'action': 'start-instances', 'cron': '0 8 * * *'}],\
+	        'QA_US_321 relay 2': [{'action': 'stop-instances', 'cron': '0 20 * * *'}],\
+	        'QA_US_321 portal 1': [{'action': 'start-instances', 'cron': '0 8 * * *'}],\
+	        'QA_US_321 portal 2': [{'action': 'stop-instances', 'cron': '0 20 * * *'}],\
+	        'QA_US_321 dcd 1': [{'action': 'start-instances', 'cron': '0 8 * * *'}],\
+	        'QA_US_321 dcd 2': [{'action': 'start-instances', 'cron': '0 8 * * *'}],\
+	        'QA_US_321 dcd 3': [{'action': 'stop-instances', 'cron': '0 20 * * *'}],\
+	        'QA_US_321 dcd 4': [{'action': 'stop-instances', 'cron': '0 20 * * *'}],\
+	        'QA_US_321 signal 1': [{'action': 'start-instances', 'cron': '0 8 * * *'}],\
+	        'QA_US_321 signal 2': [{'action': 'stop-instances', 'cron': '0 20 * * *'}],\
+	        'QA_US_321 signal 3': [{'action': 'stop-instances', 'cron': '0 20 * * *'}],\
+	        'QA_US_321 signal 4': [{'action': 'stop-instances', 'cron': '0 20 * * *'}],\
+	        'QA_US_321 hermes 1': [{'action': 'start-instances', 'cron': '0 8 * * *'}],\
+	        'QA_US_321 hermes 2': [{'action': 'stop-instances', 'cron': '0 20 * * *'}],\
+	        'QA_US_321 logger 1': [{'action': 'start-instances', 'cron': '0 8 * * *'}],\
+	        'QA_US_321 morpheus 1': [{'action': 'start-instances', 'cron': '0 8 * * *'}],}",
+			description: 'cfg of server status'
+		),
+    ])
+])
+node ('master') {
+    stage('Create server_status.cfg') {
+        sh """
+        sudo python3 ${params.aws_tool_dir}/update_cfg_redis.py -u "${params.aws_apiscan_url}" -p "${params.redis_port}" -j "${params.server_cfg}"
+        """
+    }
+    stage('excute server_cfg') {
+        sh """
+        sudo python3 ${params.aws_tool_dir}/use_cfg_manipulate_server.py -u "${params.aws_apiscan_url}" -p "${params.redis_port}"
+        """
+    }
+}

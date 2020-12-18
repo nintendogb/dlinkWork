@@ -1,0 +1,14 @@
+---
+- hosts: server
+  serial: 1
+  gather_facts: false
+  tasks:
+    - name: Start dcd load balance test tool
+      shell: "ulimit -n 65536;nohup ./start_perf.sh {{ 2* (groups['server'].index(inventory_hostname) | int) + 1 }} 2>&1 &"
+      args:
+        chdir: ~/dcd_tester/{{ tool_dir }}
+
+    - name: Start dcd load balance test tool 2
+      shell: "ulimit -n 65536;nohup ./start_perf.sh {{ 2* (groups['server'].index(inventory_hostname) | int) + 1 }} 2>&1 &"
+      args:
+        chdir: ~/dcd_tester/{{ tool_dir }}

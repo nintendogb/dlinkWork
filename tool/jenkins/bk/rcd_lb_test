@@ -1,0 +1,70 @@
+properties([
+    parameters([
+		string(name: 'aws_tool_dir',
+		    defaultValue: '/home/dlink/tool/tool/jenkins2aws',
+			description: 'directory of aws tool'
+		),		
+		string(name: 'res_dir',
+		    defaultValue: '/home/dlink/auto_res',
+			description: 'directory of auto test result'
+		),
+		string(name: 'rcd_tool_dir',
+		    defaultValue: '/home/dlink/tool/tool/rcd_ECDHE',
+			description: 'directory of rcd tool'
+		),
+		string(name: 'rcd_num',
+			defaultValue: '3',
+			description: 'number of rcd'
+		),
+    ])
+])
+node ('master') {
+    stage('Launch rcd tool instance') {
+        sh """
+		sudo python3 ${params.aws_tool_dir}/gen_instance_json.py -n SQAD_rcd_tool_1 -d ${params.aws_tool_dir}
+		sudo python3 ${params.aws_tool_dir}/gen_instance_json.py -n SQAD_rcd_tool_2 -d ${params.aws_tool_dir}
+		sudo aws ec2 run-instances --region us-west-1 --count 1 --cli-input-json file://${params.aws_tool_dir}/SQAD_rcd_tool_1.json
+		sudo aws ec2 run-instances --region us-west-1 --count 1 --cli-input-json file://${params.aws_tool_dir}/SQAD_rcd_tool_2.json
+		${params.aws_tool_dir}/check_instance_on.sh SQAD_rcd_tool_1
+        ${params.aws_tool_dir}/check_instance_on.sh SQAD_rcd_tool_2
+        """
+    }
+	stage('Setup environment to instance') {
+        sh """
+		sudo chmod -R a+r ${params.rcd_tool_dir}/rcd_test
+		sudo chmod -R a+w ${params.rcd_tool_dir}/rcd_test
+		sudo python3  ${params.aws_tool_dir}/update_ansible_inventory.py -n SQAD_rcd_tool_* -d ${params.rcd_tool_dir}
+		ansible-playbook -i ${params.rcd_tool_dir}/rcd_lb_test ${params.rcd_tool_dir}/make_env_script.yml
+        """
+    }
+    stage('Start rcd tool') {
+        sh """
+        ansible-playbook -i ${params.rcd_tool_dir}/rcd_lb_test ${params.rcd_tool_dir}/start_test_script.yml
+        """
+    }
+    stage('start monitor tool') {
+        sh """
+		sudo nohup ${params.rcd_tool_dir}/auto_result_parse/watch_get_rcd.sh ${params.rcd_num} &
+        """
+    }
+    stage('just sleep') {
+        sh """
+		sleep 180
+        """
+    }
+    stage('stop monitor tool') {
+        sh '''
+		sudo kill -9 $(ps aux | grep -v grep | grep 'watch_get_rcd.sh' | awk '{ print $2 }')
+        '''
+    }
+    stage('Terminate rcd tool instance') {
+        sh """
+		sudo python3 ${params.aws_tool_dir}/ctl_aws_instance.py -n 'SQAD_rcd_tool_*' -a terminate-instances
+        """
+    }
+    stage('generate test result') {
+        sh """
+		sudo ${params.rcd_tool_dir}/auto_result_parse/cal_res.sh ${params.rcd_num} ${params.res_dir}
+        """
+    }
+}

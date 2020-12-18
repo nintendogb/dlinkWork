@@ -1,0 +1,80 @@
+properties([
+    parameters([
+		string(name: 'dcd_tool_name',
+		    defaultValue: 'SQAD_dcd_tool',
+			description: 'name of ec2 dcd tool server'
+		),
+		string(name: 'aws_tool_dir',
+		    defaultValue: '/home/dlink/tool/tool/jenkins2aws',
+			description: 'directory of aws tool'
+		),		
+		string(name: 'dcd_tool_dir',
+		    defaultValue: '/home/dlink/tool/tool/dcd_loadbalance',
+			description: 'directory of dcd tool'
+		),
+		string(name: 'rcd_tool_name',
+		    defaultValue: 'SQAD_rcd_tool',
+			description: 'name of ec2 rcd tool server'
+		),
+		string(name: 'rcd_tool_dir',
+		    defaultValue: '/home/dlink/tool/tool/rcd_ECDHE',
+			description: 'directory of rcd tool'
+		),
+		string(name: 'redis_url',
+			defaultValue: '******************',
+			description: 'url of redis server'
+		),
+	    string(name: 'redis_port',
+			defaultValue: '6379',
+			description: 'port of redis server'
+		),
+		string(name: 'dev_num',
+			defaultValue: '700',
+			description: 'number of dev to insert to redis'
+		),
+    ])
+])
+node ('master') {
+    stage('prepare test tool instance') {
+        sh """
+        # sudo aws ec2 run-instances --region us-west-1 --count 1 --cli-input-json file://${params.aws_tool_dir}/dcd_tool.json
+        # sudo aws ec2 run-instances --region us-west-1 --count 1 --cli-input-json file://${params.aws_tool_dir}/rcd_tool.json
+        """
+    }
+    stage('prepare necessary server for testing') {
+        sh """
+        echo 'stop dcd 3, 4'
+        sudo python3 ${params.aws_tool_dir}/ctl_aws_instance.py -n 'QA_US_321 dcd 3' -a stop-instances
+        sudo python3 ${params.aws_tool_dir}/ctl_aws_instance.py -n 'QA_US_321 dcd 4' -a stop-instances
+        echo 'restart openapi 1, 2'
+        sudo python3 ${params.aws_tool_dir}/ctl_aws_instance.py -n 'QA_US_321 openapi 1' -a reboot-instances
+        sudo python3 ${params.aws_tool_dir}/ctl_aws_instance.py -n 'QA_US_321 openapi 2' -a reboot-instances
+        echo 'stop openapi 3, 4'
+        sudo python3 ${params.aws_tool_dir}/ctl_aws_instance.py -n 'QA_US_321 openapi 3' -a stop-instances
+        sudo python3 ${params.aws_tool_dir}/ctl_aws_instance.py -n 'QA_US_321 openapi 4' -a stop-instances
+        """
+    }
+    stage('insert device data to redis') {
+        sh """
+        python3 "${params.rcd_tool_dir}"/insert_data2redis.py -u "${params.redis_url}" -p "${params.redis_port}" -n "${params.dev_num}"
+        """
+    }
+    stage('prepare inventory config for ansible') {
+        sh """
+        sudo python3 ${params.rcd_tool_dir}/gen_rcd_cfg4ansible.py -n ${params.rcd_tool_name} -d ${params.rcd_tool_dir} -c ${params.dev_num}
+        # sudo python3 ${params.dcd_tool_dir}/gen_dcd_cfg4ansible.py -n ${params.dcd_tool_name} -d ${params.dcd_tool_dir}
+        """
+    }
+    stage('rsync tool to aws instance') {
+        sh """
+        # ansible-playbook -i "${params.dcd_tool_dir}"/dcd_cfg "${params.dcd_tool_dir}"/make_env.yml
+        ansible-playbook -i "${params.rcd_tool_dir}"/rcd_cfg "${params.rcd_tool_dir}"/make_env_script.yml
+        """
+    }
+    stage('start testing') {
+        sh """
+        # ansible-playbook -i "${params.dcd_tool_dir}"/dcd_cfg "${params.dcd_tool_dir}"/start_perf.yml
+        ansible-playbook -i "${params.rcd_tool_dir}"/rcd_cfg "${params.rcd_tool_dir}"/start_test_script.yml
+        """
+    }
+}

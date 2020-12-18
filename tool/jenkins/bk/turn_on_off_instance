@@ -1,0 +1,69 @@
+properties([
+    parameters([
+		string(name: 'aws_tool_dir',
+		    defaultValue: '/home/dlink/tool/tool/jenkins2aws',
+			description: 'directory of aws tool'
+		),		
+		string(name: 'aws_apiscan_url',
+			defaultValue: '54.67.52.204',
+			description: 'url of aws_apiscan server'
+		),
+	    string(name: 'redis_port',
+			defaultValue: '6379',
+			description: 'port of redis server'
+		),
+		choice(
+		    choices: [
+		        'QA_US_321*', 
+		        'QA_US_321 memcached*', 
+		        'QA_US_321 openapi*',
+		        'QA_US_321 openapi 1',
+		        'QA_US_321 openapi 2',
+		        'QA_US_321 openapi 3',
+		        'QA_US_321 openapi 4',
+		        'QA_US_321 rcd*',
+		        'QA_US_321 rcd 1',
+		        'QA_US_321 rcd 2',
+		        'QA_US_321 rcd 3',
+		        'QA_US_321 relay*',
+		        'QA_US_321 relay 1',
+		        'QA_US_321 relay 2',
+		        'QA_US_321 portal*', 
+		        'QA_US_321 portal 1',
+		        'QA_US_321 portal 2', 
+		        'QA_US_321 dcd*',
+		        'QA_US_321 dcd 1',
+		        'QA_US_321 dcd 2',
+		        'QA_US_321 dcd 3',
+		        'QA_US_321 dcd 4',
+		        'QA_US_321 signal*',
+		        'QA_US_321 signal 1',
+		        'QA_US_321 signal 2',
+		        'QA_US_321 signal 3',
+		        'QA_US_321 signal 4', 
+		        'QA_US_321 hermes*', 
+		        'QA_US_321 hermes 1',
+		        'QA_US_321 hermes 2',
+		        'QA_US_321 logger*', 
+		        'QA_US_321 morpheus*'
+		   ], 
+		   description: 'Which instance to trigger action.', 
+		   name: 'instances'
+	    ), 
+	    choice(
+	        choices: [
+	            'start-instances', 
+	            'stop-instances'
+	        ], 
+	        description: 'Which action to trigger.', 
+	        name: 'action'
+	    ),
+    ])
+])
+node ('master') {
+    stage('control aws instance') {
+        sh """
+        sudo python3 ${params.aws_tool_dir}/ctl_aws_instance.py -n '${params.instances}' -a ${params.action}
+        """
+    }
+}

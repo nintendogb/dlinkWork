@@ -1,0 +1,37 @@
+---
+- hosts: server
+  gather_facts: true
+  tasks:
+    - name: install certain python modules for docker
+      pip:
+        name: "{{ item.name }}"
+        state: present
+      with_items:
+      - { name: docker-py }
+
+    - name: Ansible sync test file to remote
+      synchronize:
+        src: ./rcd_test
+        dest: ~/
+
+    - name: Make test script
+      shell: python3 gen_test_script.py --dev "{{ dev_num }}" --host "{{ groups['server'] | length }}"
+      args:
+        chdir: "{{ ansible_env.HOME }}/rcd_test/"
+
+    - name: Build rcd_ecdhe image
+      docker_image:
+        state: present
+        force_source: yes
+        build:
+          path: "{{ ansible_env.HOME }}/rcd_test/"
+          pull: yes
+        name: rcd_ecdhe
+        source: build
+
+    - name: Set periodic docker system prune
+      cron:
+        name: 'docker-prune'
+        minute: '0'
+        hour: '*/2'
+        job: 'docker container prune -f'

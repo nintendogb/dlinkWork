@@ -1,0 +1,49 @@
+{
+  "selected": "load_balance",
+  "load_balance":{
+    "site_prefix": "rd-rdsg",
+    "da":{
+      "default": {
+        "delay_connect":[1,49],
+        "cipher_list":"ECDHE-RSA-AES128-SHA256",
+        "key_path": "client.crt.key",
+        "cert_path": "client.crt.pem",
+        "step":{
+          "0":{
+            "request_parameter":{
+              "command":"sign_in"
+            }
+          },
+          "1":{
+            "round":5,
+            "pre_pause":[5],
+            "request_parameter":{
+              "command": "get_policy",
+              "version": ""
+            }
+          },
+          "2":{
+            "pre_pause":[2,10],
+            "request_parameter":{
+              "command": "get_regular",
+              "version": ""
+            }
+          }
+        }
+      },
+      "44460068":{
+        "delay_connect":[3],
+        "device_id":"1CD6BDB4A4BA",
+        "step":{
+          "0":{
+            "request_parameter":{
+              "command":"sign_in",
+              "device_model":"DCS-8325LH",
+              "pin_code":"123456"
+            }
+          }
+        }
+      }
+    }
+  }
+}

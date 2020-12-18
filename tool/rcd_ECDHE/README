@@ -1,0 +1,68 @@
+先用SQAD_ubuntu_XXXXXXX AMI建instance
+
+接著更改同目錄下inventory
+
+[server:vars]
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+dev_num=4000    # 總共要跑多少tool process, 會自動平均分給底下各server
+
+[server]
+18.144.43.111 ansible_user=qateam  # 更改IP就好
+52.53.220.24 ansible_user=qateam
+13.57.231.190 ansible_user=qateam
+18.144.44.120 ansible_user=qateam
+
+
+建立測試環境指令
+ansible-playbook -i inventory make_env_script.yml
+
+開始測試指令
+ansible-playbook -i inventory start_test_script.yml
+
+結束測試指令
+ansible-playbook -i inventory stop_test_script.yml
+
+看目前在跑的所有tool processes數量
+ansible all -i inventory -m shell -a 'ps -aux | grep "15 0 1 1" | wc -l'
+
+看所有instance CPU
+ansible all -i inventory -m shell -a 'mpstat -P ALL'
+
+看所有instance MEM
+ansible all -i inventory -m shell -a 'free -h'
+
+
+
+
+監控方式
+請在54.67.52.204用crontab或watch執行/home/qateam/get_rcd_log.sh
+
+
+log統計
+到10.32.5.100的/home/dlink/tool/tool/rcd_ECDHE/log_parse
+
+建立ts資料夾並從54.67.52.204抓取log放入並做成csv檔之script
+cal_res.sh
+
+從已存好之log讀取max資訊之python檔之指令
+python3 ./get_max.py --ts {{ ts dir name }}
+
+ex: python3 ./get_max.py --ts 202003130955
+
+output:
+Max_total_conn: 4205
+Max_rcd1_conn: 2162
+Max_rcd2_conn: 1060
+Max_rcd3_conn: 1322
+Max_rcd4_conn: 1916
+
+Max_rcd1_cpu: 87.3%
+Max_rcd2_cpu: 85.7%
+Max_rcd3_cpu: 82.74%
+Max_rcd4_cpu: 83.86%
+
+Max_rcd1_mem: 66.93%
+Max_rcd2_mem: 42.37%
+Max_rcd3_mem: 50.17%
+Max_rcd4_mem: 61.81%

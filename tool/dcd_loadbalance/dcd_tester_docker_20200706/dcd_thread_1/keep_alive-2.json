@@ -1,0 +1,22 @@
+{
+    "base_case": {
+        "site_prefix": "qa-us-dcdda-1.auto.mydlink.com:443/SwitchCamera",
+        "da": {
+            "default": {
+                "delay_connect": [
+                    0,
+                    50
+                ],
+                "cipher_list": "ECDHE-RSA-AES128-SHA256",
+                "step": {
+                    "0": {
+                        "request_parameter": {
+                            "command": "sign_in"
+                        }
+                    }
+                }
+            },
+            "88010000_10000": {}
+        }
+    }
+}

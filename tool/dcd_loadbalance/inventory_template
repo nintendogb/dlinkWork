@@ -1,0 +1,8 @@
+[server:vars]
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+number_of_tester_process=2
+tool_dir=dcd_tester_docker_20200408
+ansible_user=qateam
+
+[server]

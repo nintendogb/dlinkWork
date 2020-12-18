@@ -1,0 +1,11 @@
+---
+- hosts: server
+  gather_facts: true
+  tasks:
+    - name: stop rcd_ecdhea_watch_dog
+      shell: kill -9 $(ps aux | grep -v grep | grep 'rcd_watch_dog.sh' | awk '{ print $2 }')
+      become: true
+
+    - name: stop rcd_ecdhe test
+      shell: kill -9 $(ps aux | grep -v grep | grep 'rcd_test' | awk '{ print $2 }')
+      become: true

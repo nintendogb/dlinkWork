@@ -1,0 +1,15 @@
+---
+- hosts: server
+  serial: 1
+  gather_facts: false
+  tasks:
+    - name: Start dcd sign-in
+      shell: "ulimit -n 65536;nohup python3 run_test.py --file_path /home/qateam/dcd_tester/{{ tool_dir }}/dcd_thread_{{
+                   (groups['server'].index(inventory_hostname) | int) + 1
+               }}/sign_in.json  >> signin.log 2>&1 &"
+      args:
+        chdir: ~/dcd_tester/{{ tool_dir }}
+
+    - name: Sleep 5 secs for 1 host
+      pause:
+        seconds: 30

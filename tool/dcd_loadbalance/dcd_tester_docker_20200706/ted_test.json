@@ -1,0 +1,45 @@
+{
+  "selected":"event",
+  "event":{
+    "site_prefix": "qa-us",
+    "da":{
+      "default": {
+        "delay_connect":[5,40],
+        "step":{
+          "0":{
+            "request_parameter":{
+              "command":"sign_in"
+            }
+          },
+          "1":{
+            "pre_pause":[18],
+            "request_parameter":{
+              "command":"event",
+              "event":{
+                "type":56,
+                "name":"Policy Condition Hit",
+                "metadata":{
+                  "conditions":[
+                    {
+                       "X":{
+                        "status":{"uid":15766853,"type":8,"idx":0}
+                       },
+                       "op":"ge",
+                       "Y":{"value":0},
+                       "V":{"value":53}
+                    }
+                  ],
+                  "actions":[]
+                }
+              }
+            }
+          }
+        }
+      
+
+      },
+      "8800000[0-9]":{       
+      }
+    }
+  }
+}

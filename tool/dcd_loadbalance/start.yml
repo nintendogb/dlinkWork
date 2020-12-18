@@ -1,0 +1,20 @@
+---
+- hosts: server
+  serial: 1
+  gather_facts: false
+  tasks:
+    - name: Start dcd load balance test tool
+      shell: "ulimit -n 65536;nohup python3 run_test.py --file_path lb{{
+                   (groups['server'].index(inventory_hostname) | int) * (number_of_tester_process | int) + (item | int)
+               }}.json >> LB_{{
+                   (groups['server'].index(inventory_hostname) | int) * (number_of_tester_process | int) + (item | int)
+               }}.log 2>&1 &"
+      args:
+        chdir: ~/dcd_tester/{{ tool_dir }}
+      with_sequence: count="{{ number_of_tester_process }}"
+      loop_control:
+        pause: 1
+
+    - name: Sleep 1 secs for 1 host
+      pause:
+        seconds: 1
