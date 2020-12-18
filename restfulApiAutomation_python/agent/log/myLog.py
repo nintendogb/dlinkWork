@@ -35,7 +35,7 @@ class MyLog(object):
         self.logger.setLevel(level)
 
     def logToFile(self, logFile):
-        filehandler = logging.FileHandler(logFile)
+        filehandler = logging.FileHandler(logFile, 'a', 'utf-8')
         filehandler.setFormatter(self.formatter)
         self.logger.addHandler(filehandler)
 

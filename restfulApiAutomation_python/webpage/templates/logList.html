@@ -59,7 +59,7 @@
             <td>...</td>
             <td><a href="{{ url_for('log.log_list', page = totalPage) }}">{{ totalPage }}</a></td>
                 {% elif currentPage>=totalPage-3 and currentPage<=totalPage %}
-            <td><a href="{{ url_for('log.log_list', page = totalPage) }}">1</a></td>
+            <td><a href="{{ url_for('log.log_list', page = 1) }}">1</a></td>
             <td>...</td>
                     {% for number in range(totalPage-8, totalPage+1) %}
             <td><a href="{{ url_for('log.log_list', page = number) }}">{{ number }}</a></td>

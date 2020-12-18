@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+{% extends "layout.html" %}
+
+{% block main %}
+
+
+{% if error_info != 'NO ERROR' %}
+<p>ERROR!!!!  [{{ error_info }}]</p>
+{% elif account != 'no_input' %}
+<p>Get ts clip link from user: {{ account }}.</p>
+<p>At ts time: {{ timestamp }}.</p>
+<p>From Device: {{ mydlink_id }}.</p>
+<p>WARNING!!!  You need to download ts clip fast, the link will expired in short time.</p>
+<table border="1" style="word-break:normal; word-wrap:break-all;"  align="center">
+    <thead>
+    </thead>
+    <tbody>
+      <meta charset="UTF-8">
+        {% for link_url in url_list %}
+        <tr>
+            <td align="left" >
+                <p><a href="{{ link_url }}">DOWNLOAD TS CLIP {{ loop.index }}</a></p>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% endblock %}
+
+{% block footer %}
+<form action="/tool/get-event-clip" name="getEventClip">
+    Testing Account: <input type="email" name="account">
+    Testing Account's Password: <input type="password" name="password">
+    Mydlink ID: <input type="int" name="mydlink_id">
+    Timestamp of event: <input type="int" name="timestamp">
+    <input type="submit" value="查詢">
+</form>
+
+{% endblock %}

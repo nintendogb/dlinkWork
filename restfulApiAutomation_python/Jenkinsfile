@@ -9,12 +9,16 @@ properties([
 			description: 'Where to put log'
 		),
 		string(name: 'TEST_INTERVAL',
-			defaultValue: '5',
+			defaultValue: '20',
 			description: 'interval for test'
 		),
 		string(name: 'LOG_CHECK_INTERVAL',
-			defaultValue: '5',
+			defaultValue: '20',
 			description: 'interval for log check'
+		),
+		string(name: 'ALERT_INTERVAL',
+			defaultValue: '60',
+			description: 'interval for sending alert'
 		),
     ])
 ])
@@ -24,7 +28,7 @@ node ('aws_apiscan') {
     stage('install python lib on aws_apiscan') {
         sh """
         pwd
-        python3 ./jenkins_deploy_script/modifyConfig.py -w "${params.WORK_DIR}" -l "${params.LOG_DIR}" -p "${params.LOG_CHECK_INTERVAL}"
+        python3 ./jenkins_deploy_script/modifyConfig.py -w "${params.WORK_DIR}" -l "${params.LOG_DIR}" -p "${params.LOG_CHECK_INTERVAL}" -a "${params.ALERT_INTERVAL}"
         sudo python3 setup.py install
         """
     }
@@ -61,7 +65,14 @@ node ('aws_apiscan') {
         sh '''
         sudo docker build --rm -t python_apiscan .
         sudo docker system prune --force
+        sudo rm -f /home/qateam/apiscanPython_*.tar || echo "No image to remove"
+        sudo docker save -o /home/qateam/apiscanPython_$(date +"%Y%m%d%H%M").tar python_apiscan
         '''
+    }
+    stage('Binding virtual dev to test account and setting up') {
+        sh """
+        sudo docker run --rm python_apiscan python3 /test/bind_test_dev.py || echo "There has some error at binding step"
+        """
     }
     stage('Update crontab for user qateam') {
         sh """
@@ -76,14 +87,26 @@ echo "*/${params.LOG_CHECK_INTERVAL} * * * * docker run \
 -v ${params.WORK_DIR}/webpage/static/testLog:/webpage/static/testLog \
 --net=host \
 --rm \
--d python_apiscan routine_script/checkLog.py") | sort | uniq | sudo crontab - -u qateam
+-d python_apiscan python3 routine_script/checkLog.py") | sort | uniq | sudo crontab - -u qateam
 
 
             (sudo crontab -l -u qateam 2> /dev/null; echo "0 0 * * * docker run \
 -v ${params.LOG_DIR}:/log \
 -v ${params.WORK_DIR}/webpage/static/testLog:/webpage/static/testLog \
 --rm \
--d python_apiscan routine_script/rmTimeoutZip.py") \
+-d python_apiscan python3 routine_script/rmTimeoutZip.py") \
+| sort | uniq | sudo crontab - -u qateam
+
+            (sudo crontab -l -u qateam 2> /dev/null; echo "*/${params.ALERT_INTERVAL} * * * * docker run \
+--net=host \
+--rm \
+-d python_apiscan python3 routine_script/checkFailThres.py") \
+| sort | uniq | sudo crontab - -u qateam
+
+            (sudo crontab -l -u qateam 2> /dev/null; echo "0 8 * * * docker run \
+--net=host \
+--rm \
+-d python_apiscan python3 test/change_guest_password.py") \
 | sort | uniq | sudo crontab - -u qateam
 
             sudo crontab -l -u qateam
@@ -94,14 +117,33 @@ echo "*/${params.LOG_CHECK_INTERVAL} * * * * docker run \
         withEnv(['JENKINS_NODE_COOKIE=dontkillme']) {
             sh """
                 sudo docker run --name test_result -p 6379:6379 -v ${params.WORK_DIR}/redisData:/data -d --restart always redis redis-server --appendonly yes
-                sudo docker run --name result_page -v ${params.WORK_DIR}/webpage/static/testLog:/webpage/static/testLog --net=host -d --restart always python_apiscan
+                sudo docker run --name result_page -v ${params.WORK_DIR}/webpage/static/testLog:/webpage/static/testLog --net=host -d --restart always python_apiscan python3 ./webpage/start.py
             """
         }
     }
     stage('unnittest test') {
         sh """
         #python3 ./test/pc_unittest.py
-            sudo docker run --rm python_apiscan test/pc_unittest.py
+            sudo docker run --rm python_apiscan python3 test/pc_unittest.py
         """
+    }
+}
+node ('master') {
+    checkout scm
+    stage('install python lib') {
+        sh """
+        pwd
+        sudo python3 setup.py install
+        """
+    }
+    stage('build docker image') {
+        sh '''
+        python3 ./jenkins_deploy_script/makeScript.py
+        sudo docker build --rm -t python_apiscan .
+        sudo docker system prune --force
+        sudo rm -f /home/dlink/dockerImage/apiscanPython_*.tar || echo "No image to remove"
+        sudo docker save -o /home/dlink/dockerImage/apiscanPython_$(date +"%Y%m%d%H%M").tar python_apiscan
+        sudo chmod 777 /home/dlink/dockerImage/apiscanPython_*.tar
+        '''
     }
 }

@@ -3,7 +3,7 @@ from datetime import datetime
 from datetime import timedelta
 import glob
 import os
-import config.parameter as parameter
+import agent.config.parameter as parameter
 zip_list = [
     f for f in glob.glob(
         '/webpage/static/testLog/*.zip'

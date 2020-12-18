@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+{% extends "layout.html" %}
+
+{% block main %}
+
+
+{% if devData == 'NoData' %}
+<p>Authantication to openapi failed or there has no device binding to this account.</p>
+{% elif account != 'no_input' %}
+<p>List all dev info from Account: {{ account }}.</p>
+<table border="1" style="word-break:normal; word-wrap:break-all;"  align="center">
+    <thead>
+    <th>device ID</th>
+    <th>information</th>
+    </thead>
+    <tbody>
+      <meta charset="UTF-8">
+      {% for devId in devData %}
+        <tr>
+            <td align="center" >
+                <p>{{ devId }}</p>
+            </td>
+            <td align="left" >
+            {% for item in devData[devId] %}
+                <p>{{ item }}</p>
+            {% endfor %}
+            </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% endblock %}
+
+{% block footer %}
+<form action="/tool/dev-info" name="getDevInfo">
+    Testing Account: <input type="email" name="account">
+    Testing Account's Password: <input type="password" name="password">
+    <input type="submit" value="查詢">
+</form>
+
+{% endblock %}

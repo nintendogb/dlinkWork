@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+{% extends "layout.html" %}
+
+{% block main %}
+
+{% if error_info != 'NO ERROR' %}
+<p>ERROR!!!!  [{{ error_info }}]</p>
+{% elif account != 'no_input' %}
+<p>List story board info under Account: {{ account }}.</p>
+<p>From {{ start }} to {{ end }} of device[{{ mydlink_id }}].</p>
+<table border="1" style="word-break:normal; word-wrap:break-all;"  align="center">
+    <thead>
+    </thead>
+    <tbody>
+      <meta charset="UTF-8">
+        <tr>
+            <td align="center" >
+                <p>Storyboard range info</p>
+            </td>
+            <td align="left" >
+                <p>START_TS: {{ storyboardProperty['start_ts'] }}</p>
+                <p>END_TS: {{ storyboardProperty['end_ts'] }}</p>
+            </td>
+        </tr>
+        <tr>
+        </tr>
+        {% for story in storyboardProperty['list'] %}
+        <tr>
+            <td align="center" >
+                <p>Storyboard data{{ loop.index }}</p>
+            </td>
+            <td align="left" >
+                <p>start_ts: {{ story['start_ts'] }}</p>
+                <p>end_ts: {{ story['end_ts'] }}</p>
+                <p>attribute: {{ story['attribute'] }}</p>
+                <p><a href="{{ story['path'] }}">PIC PATH</a></p>
+            </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% endblock %}
+
+{% block footer %}
+<form action="/tool/get-storyboard" name="getStoryboard">
+    Testing Account: <input type="email" name="account">
+    Testing Account's Password: <input type="password" name="password">
+    MYDLINK ID: <input type="int" name="mydlink_id">
+    Start timestamp of event: <input type="int" name="start">
+    End timestamp of event: <input type="int" name="end">
+    <input type="submit" value="查詢">
+</form>
+
+{% endblock %}

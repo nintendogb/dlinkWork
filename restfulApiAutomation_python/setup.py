@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pythonClient',
-    version='1.0',
+    version='3.0',
     description='This is python version of apiscan',
     author='Ted Kao',
     author_email='nintendogb@gmail.com',
@@ -15,6 +15,11 @@ setup(
         "redis",
         "flask-restful",
         "flask-login",
-        "tornado"
+        "tornado",
+        "beautifulsoup4",
+        "websockets",
+        "magicfile",
+        "pycryptodome",
+        "PyJWT",
     ],
 )
